@@ -6,17 +6,24 @@ var sha256: any = _sha256;
 
 export class OAuthService {
 
-    clientId = "";
-    redirectUri = "";
-    loginUrl = "";
-    scope = "";
-    rngUrl = "";
-    oidc = false;
-    options: any;
-    state = "";
-    issuer = "";
-    validationHandler: any;
-        
+    public clientId = "";
+    public redirectUri = "";
+    public loginUrl = "";
+    public scope = "";
+    public rngUrl = "";
+    public oidc = false;
+    public options: any;
+    public state = "";
+    public issuer = "";
+    public validationHandler: any;
+    public logoutUrl = "";
+    
+    public setStorage(storage: Storage) {
+        this._storage = storage;
+    }
+    
+    private _storage: Storage = localStorage;
+    
     createLoginUrl(state) {
         var that = this;
 
@@ -97,13 +104,13 @@ export class OAuthService {
         if (!accessToken || !state) return false;
         if (this.oidc && !idToken) return false;
 
-        var savedNonce = localStorage.getItem("nonce");
+        var savedNonce = this._storage.getItem("nonce");
 
         var stateParts = state.split(';');
         var nonceInState = stateParts[0];
         if (savedNonce === nonceInState) {
             
-            localStorage.setItem("access_token", accessToken);
+            this._storage.setItem("access_token", accessToken);
 
             var expiresIn = parts["expires_in"];
 
@@ -111,7 +118,7 @@ export class OAuthService {
                 var expiresInMilliSeconds = parseInt(expiresIn) * 1000;
                 var now = new Date();
                 var expiresAt = now.getTime() + expiresInMilliSeconds;
-                localStorage.setItem("expires_at", "" + expiresAt);
+                this._storage.setItem("expires_at", "" + expiresAt);
             }
             if (stateParts.length > 1) {
                 this.state = stateParts[1];
@@ -168,7 +175,7 @@ export class OAuthService {
             var claimsBase64 = this.padBase64(tokenParts[1]);
             var claimsJson = Base64.decode(claimsBase64);
             var claims = JSON.parse(claimsJson);
-            var savedNonce = localStorage.getItem("nonce");
+            var savedNonce = this._storage.getItem("nonce");
             
             if (claims.aud !== this.clientId) {
                 console.warn("Wrong audience: " + claims.aud);
@@ -208,9 +215,9 @@ export class OAuthService {
                 return false;
             }
 
-            localStorage.setItem("id_token", idToken);
-            localStorage.setItem("id_token_claims_obj", claimsJson);
-            localStorage.setItem("id_token_expires_at", "" + expiresAtMSec);
+            this._storage.setItem("id_token", idToken);
+            this._storage.setItem("id_token_claims_obj", claimsJson);
+            this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
             
             if (this.validationHandler) {
                 this.validationHandler(idToken)
@@ -220,13 +227,13 @@ export class OAuthService {
     }
     
     getIdentityClaims() {
-        var claims = localStorage.getItem("id_token_claims_obj");
+        var claims = this._storage.getItem("id_token_claims_obj");
         if (!claims) return null;
         return JSON.parse(claims);
     }
     
     getIdToken() {
-        return localStorage.getItem("id_token");
+        return this._storage.getItem("id_token");
     }
     
     padBase64(base64data) {
@@ -245,13 +252,13 @@ export class OAuthService {
     };
 
     getAccessToken() {
-        return localStorage.getItem("access_token");
+        return this._storage.getItem("access_token");
     };
 
     hasValidAccessToken() {
         if (this.getAccessToken()) {
 
-            var expiresAt = localStorage.getItem("expires_at");
+            var expiresAt = this._storage.getItem("expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
                 return false;
@@ -266,7 +273,7 @@ export class OAuthService {
     hasValidIdToken() {
         if (this.getIdToken) {
 
-            var expiresAt = localStorage.getItem("id_token_expires_at");
+            var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
                 return false;
@@ -278,21 +285,29 @@ export class OAuthService {
         return false;
     };
     
-
+    authorizationHeader() {
+        return "Bearer " + this.getAccessToken();
+    }
+    
     logOut() {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("id_token");
-        localStorage.removeItem("nonce");
-        localStorage.removeItem("expires_at");
-        localStorage.removeItem("id_token_claims_obj");
-        localStorage.removeItem("id_token_expires_at");
+        var id_token = this.getIdToken();
+        this._storage.removeItem("access_token");
+        this._storage.removeItem("id_token");
+        this._storage.removeItem("nonce");
+        this._storage.removeItem("expires_at");
+        this._storage.removeItem("id_token_claims_obj");
+        this._storage.removeItem("id_token_expires_at");
+        
+        if (!this.logoutUrl) return;
+        
+        var logoutUrl = this.logoutUrl.replace(/\{\{id_token\}\}/, id_token);
+        location.href = logoutUrl;
     };
 
     createAndSaveNonce() {
-        // var state = this.createNonce();
-
+        var that = this;
         return this.createNonce().then(function (nonce: any) {
-            localStorage.setItem("nonce", nonce);
+            that._storage.setItem("nonce", nonce);
             return nonce;
         })
 

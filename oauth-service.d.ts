@@ -9,6 +9,9 @@ export declare class OAuthService {
     state: string;
     issuer: string;
     validationHandler: any;
+    logoutUrl: string;
+    setStorage(storage: Storage): void;
+    private _storage;
     createLoginUrl(state: any): Promise<string>;
     initImplicitFlow(additionalState?: string): void;
     callEventIfExists(options: any): void;
@@ -22,6 +25,7 @@ export declare class OAuthService {
     getAccessToken(): any;
     hasValidAccessToken(): boolean;
     hasValidIdToken(): boolean;
+    authorizationHeader(): string;
     logOut(): void;
     createAndSaveNonce(): Promise<any>;
     createNonce(): Promise<{}>;

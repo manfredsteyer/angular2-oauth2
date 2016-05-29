@@ -1,18 +1,14 @@
 {
   "name": "angular2-oauth2",
-  "version": "1.3.3",
+  "version": "1.3.5",
   "description": "",
   "main": "oauth-service.js",
   "author": "Manfred Steyer (http://www.softwarearchitekt.at)",
   "license": "MIT",
   "dependencies": {
-    "base64-js": "^1.0.4",
-    "buffer": "^4.5.0",
+    "base64-js": "^0",
+    "buffer": "^3",
     "js-base64": "^2.1.9",
     "sha256": "^0.2.0"
-  },
-  "scripts": {
-    "bundle": "jspm bundle oauth2\\oauth-service.js bundles\\oauth2.js",
-    "def": "tsc -d"
   }
 }

@@ -13,7 +13,12 @@ var OAuthService = (function () {
         this.oidc = false;
         this.state = "";
         this.issuer = "";
+        this.logoutUrl = "";
+        this._storage = localStorage;
     }
+    OAuthService.prototype.setStorage = function (storage) {
+        this._storage = storage;
+    };
     OAuthService.prototype.createLoginUrl = function (state) {
         var that = this;
         if (typeof state === "undefined") {
@@ -84,17 +89,17 @@ var OAuthService = (function () {
             return false;
         if (this.oidc && !idToken)
             return false;
-        var savedNonce = localStorage.getItem("nonce");
+        var savedNonce = this._storage.getItem("nonce");
         var stateParts = state.split(';');
         var nonceInState = stateParts[0];
         if (savedNonce === nonceInState) {
-            localStorage.setItem("access_token", accessToken);
+            this._storage.setItem("access_token", accessToken);
             var expiresIn = parts["expires_in"];
             if (expiresIn) {
                 var expiresInMilliSeconds = parseInt(expiresIn) * 1000;
                 var now = new Date();
                 var expiresAt = now.getTime() + expiresInMilliSeconds;
-                localStorage.setItem("expires_at", "" + expiresAt);
+                this._storage.setItem("expires_at", "" + expiresAt);
             }
             if (stateParts.length > 1) {
                 this.state = stateParts[1];
@@ -134,7 +139,7 @@ var OAuthService = (function () {
         var claimsBase64 = this.padBase64(tokenParts[1]);
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
-        var savedNonce = localStorage.getItem("nonce");
+        var savedNonce = this._storage.getItem("nonce");
         if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
@@ -164,22 +169,22 @@ var OAuthService = (function () {
             });
             return false;
         }
-        localStorage.setItem("id_token", idToken);
-        localStorage.setItem("id_token_claims_obj", claimsJson);
-        localStorage.setItem("id_token_expires_at", "" + expiresAtMSec);
+        this._storage.setItem("id_token", idToken);
+        this._storage.setItem("id_token_claims_obj", claimsJson);
+        this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
         if (this.validationHandler) {
             this.validationHandler(idToken);
         }
         return true;
     };
     OAuthService.prototype.getIdentityClaims = function () {
-        var claims = localStorage.getItem("id_token_claims_obj");
+        var claims = this._storage.getItem("id_token_claims_obj");
         if (!claims)
             return null;
         return JSON.parse(claims);
     };
     OAuthService.prototype.getIdToken = function () {
-        return localStorage.getItem("id_token");
+        return this._storage.getItem("id_token");
     };
     OAuthService.prototype.padBase64 = function (base64data) {
         while (base64data.length % 4 !== 0) {
@@ -196,12 +201,12 @@ var OAuthService = (function () {
     };
     ;
     OAuthService.prototype.getAccessToken = function () {
-        return localStorage.getItem("access_token");
+        return this._storage.getItem("access_token");
     };
     ;
     OAuthService.prototype.hasValidAccessToken = function () {
         if (this.getAccessToken()) {
-            var expiresAt = localStorage.getItem("expires_at");
+            var expiresAt = this._storage.getItem("expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
                 return false;
@@ -213,7 +218,7 @@ var OAuthService = (function () {
     ;
     OAuthService.prototype.hasValidIdToken = function () {
         if (this.getIdToken) {
-            var expiresAt = localStorage.getItem("id_token_expires_at");
+            var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
                 return false;
@@ -223,18 +228,27 @@ var OAuthService = (function () {
         return false;
     };
     ;
+    OAuthService.prototype.authorizationHeader = function () {
+        return "Bearer " + this.getAccessToken();
+    };
     OAuthService.prototype.logOut = function () {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("id_token");
-        localStorage.removeItem("nonce");
-        localStorage.removeItem("expires_at");
-        localStorage.removeItem("id_token_claims_obj");
-        localStorage.removeItem("id_token_expires_at");
+        var id_token = this.getIdToken();
+        this._storage.removeItem("access_token");
+        this._storage.removeItem("id_token");
+        this._storage.removeItem("nonce");
+        this._storage.removeItem("expires_at");
+        this._storage.removeItem("id_token_claims_obj");
+        this._storage.removeItem("id_token_expires_at");
+        if (!this.logoutUrl)
+            return;
+        var logoutUrl = this.logoutUrl.replace(/\{\{id_token\}\}/, id_token);
+        location.href = logoutUrl;
     };
     ;
     OAuthService.prototype.createAndSaveNonce = function () {
+        var that = this;
         return this.createNonce().then(function (nonce) {
-            localStorage.setItem("nonce", nonce);
+            that._storage.setItem("nonce", nonce);
             return nonce;
         });
     };
