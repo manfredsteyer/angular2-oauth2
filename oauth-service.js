@@ -145,7 +145,7 @@ var OAuthService = (function () {
             return false;
         }
         if (this.issuer && claims.iss !== this.issuer) {
-            console.warn("Wrong issuer: " + claims.issuer);
+            console.warn("Wrong issuer: " + claims.iss);
             return false;
         }
         if (claims.nonce !== savedNonce) {
@@ -310,8 +310,13 @@ var OAuthService = (function () {
         var tokenHash = sha256(accessToken, { asBytes: true });
         var leftMostHalf = tokenHash.slice(0, (tokenHash.length / 2));
         var tokenHashBase64 = base64_js_1.fromByteArray(leftMostHalf);
-        var atHash = tokenHashBase64.replace("+", "-").replace("/", "_").replace(/=/g, "");
-        return (atHash == idClaims.at_hash);
+        var atHash = tokenHashBase64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        var claimsAtHash = idClaims.at_hash.replace(/=/g, "");
+        if (atHash != claimsAtHash) {
+            console.warn("exptected at_hash: " + atHash);
+            console.warn("actual at_hash: " + claimsAtHash);
+        }
+        return (atHash == claimsAtHash);
     };
     return OAuthService;
 }());

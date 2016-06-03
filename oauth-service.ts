@@ -183,7 +183,7 @@ export class OAuthService {
             }
 
             if (this.issuer && claims.iss !== this.issuer) {
-                console.warn("Wrong issuer: " + claims.issuer);
+                console.warn("Wrong issuer: " + claims.iss);
                 return false;
             }
 
@@ -377,16 +377,18 @@ export class OAuthService {
     checkAtHash(accessToken, idClaims) {
         if (!accessToken || !idClaims || !idClaims.at_hash ) return true;
         var tokenHash: Array<any> = sha256(accessToken, { asBytes: true });
-        
-        // var leftMostHalf = tokenHash.substr(0, tokenHash.length/2 );
         var leftMostHalf = tokenHash.slice(0, (tokenHash.length/2) );
-
         var tokenHashBase64 = fromByteArray(leftMostHalf);
-        var atHash = tokenHashBase64.replace("+", "-").replace("/", "_").replace(/=/g, ""); 
-
-        // var atHash = Base64.encodeURI(leftMostHalf);
-
-        return (atHash == idClaims.at_hash);
+        var atHash = tokenHashBase64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        var claimsAtHash = idClaims.at_hash.replace(/=/g, "");
+        
+        if (atHash != claimsAtHash) {
+            console.warn("exptected at_hash: " + atHash);    
+            console.warn("actual at_hash: " + claimsAtHash);
+        }
+        
+        
+        return (atHash == claimsAtHash);
     }
     
 }
