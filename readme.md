@@ -14,16 +14,21 @@ Successfully tested with the Angular 2 (RC) Component Router, PathLocationStrate
 - Hook for validating the signature of the received id_token
 - Single-Sign-Out by redirecting to the auth-server's logout-endpoint
 
-## Sample
+## Sample-Auth-Server
 
 You can use the following OIDC-Sample-Server for Testing. It assumes, that your Web-App runns on http://localhost:8080.
 
 Username/Password: max/geheim
 
+## Resources
+
+- Sample for using this lib: https://github.com/manfredsteyer/angular2-rc1-sample
+- Sources of this lib: https://github.com/manfredsteyer/angular2-oauth2
+
 ## Usage
 
 Following samples use Angular 2 RC 1 with the "newest RC1-Router". For samples regarding the "BETA-Router" 
-that has been depricated after the BETA-phase, see the [older version of this readme-file](beta-readme.md).
+that has been depricated after the BETA-phase, see the [older version of this readme-file](https://github.com/manfredsteyer/angular2-oauth2/blob/master/beta-readme.md).
 
 ### Setup Provider for OAuthService
 
@@ -127,7 +132,8 @@ export class HomeComponent {
         return claims.given_name; 
     }
     
-}```
+}
+```
 
 ```
 <h1 *ngIf="!name">
