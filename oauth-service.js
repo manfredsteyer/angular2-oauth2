@@ -9,6 +9,7 @@ var OAuthService = (function () {
         this.redirectUri = "";
         this.loginUrl = "";
         this.scope = "";
+        this.resource = "";
         this.rngUrl = "";
         this.oidc = false;
         this.state = "";
@@ -44,6 +45,8 @@ var OAuthService = (function () {
                 + encodeURIComponent(state)
                 + "&redirect_uri="
                 + encodeURIComponent(that.redirectUri)
+                + "&resource="
+                + encodeURIComponent(that.resource)
                 + "&scope="
                 + encodeURIComponent(that.scope);
             if (that.oidc) {

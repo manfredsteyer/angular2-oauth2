@@ -3,6 +3,7 @@ export declare class OAuthService {
     redirectUri: string;
     loginUrl: string;
     scope: string;
+    resource: string;
     rngUrl: string;
     oidc: boolean;
     options: any;
