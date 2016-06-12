@@ -45,10 +45,11 @@ var OAuthService = (function () {
                 + encodeURIComponent(state)
                 + "&redirect_uri="
                 + encodeURIComponent(that.redirectUri)
-                + "&resource="
-                + encodeURIComponent(that.resource)
                 + "&scope="
                 + encodeURIComponent(that.scope);
+            if (that.resource) {
+                url += "&resource=" + encodeURIComponent(that.resource);
+            }
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
             }
