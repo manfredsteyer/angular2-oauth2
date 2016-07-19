@@ -28,7 +28,7 @@ Username/Password: max/geheim
 ## Usage
 
 Following samples use Angular 2 RC 1 with the "newest RC1-Router". For samples regarding the "BETA-Router" 
-that has been depricated after the BETA-phase, see the [older version of this readme-file](https://github.com/manfredsteyer/angular2-oauth2/blob/master/beta-readme.md).
+that has been deprecated after the BETA-phase, see the [older version of this readme-file](https://github.com/manfredsteyer/angular2-oauth2/blob/master/beta-readme.md).
 
 ### Setup Provider for OAuthService
 
