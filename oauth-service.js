@@ -140,7 +140,12 @@ var OAuthService = (function () {
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
         var savedNonce = this._storage.getItem("nonce");
-        if (claims.aud !== this.clientId) {
+        if (Array.isArray(claims.aud)) {
+            if (-1 === claims.aud.indexOf(this.clientId)) {
+                console.warn("Wrong audience: " + claims.aud);
+                return false;
+            }
+        } else if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }
