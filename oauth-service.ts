@@ -9,14 +9,14 @@ export class OAuthService {
     public clientId = "";
     public redirectUri = "";
     public loginUrl = "";
+    public resource = "";
     public scope = "";
     public rngUrl = "";
     public oidc = false;
     public options: any;
     public state = "";
-    public resource = "";
     public issuer = "";
-    public validationHandler: any;
+    public validationHandler: any; 
     public logoutUrl = "";
     
     public setStorage(storage: Storage) {
