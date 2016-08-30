@@ -274,7 +274,7 @@ export class OAuthService {
     };
     
     hasValidIdToken() {
-        if (this.getIdToken) {
+        if (this.getIdToken()) {
 
             var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
