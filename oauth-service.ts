@@ -14,6 +14,7 @@ export class OAuthService {
     public oidc = false;
     public options: any;
     public state = "";
+    public resource = "";
     public issuer = "";
     public validationHandler: any;
     public logoutUrl = "";
@@ -53,6 +54,8 @@ export class OAuthService {
                         + encodeURIComponent(state) 
                         + "&redirect_uri=" 
                         + encodeURIComponent(that.redirectUri) 
+                        + "&resource=" 
+                        + encodeURIComponent(that.resource) 
                         + "&scope=" 
                         + encodeURIComponent(that.scope);
             
