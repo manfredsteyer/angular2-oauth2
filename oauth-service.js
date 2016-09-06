@@ -175,7 +175,7 @@ var OAuthService = (function () {
         this._storage.setItem("id_token", idToken);
         this._storage.setItem("id_token_claims_obj", claimsJson);
         this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
-        this._storage.setItem("origin", window.location.origin);
+        this._storage.setItem("id_token_issuer", this.issuer);
         if (this.validationHandler) {
             this.validationHandler(idToken);
         }
@@ -190,8 +190,8 @@ var OAuthService = (function () {
     OAuthService.prototype.getIdToken = function () {
         return this._storage.getItem("id_token");
     };
-    OAuthService.prototype.getOrigin = function () {
-        return this._storage.getItem("origin");
+    OAuthService.prototype.getIssuer = function () {
+        return this._storage.getItem("id_token_issuer");
     };
     OAuthService.prototype.padBase64 = function (base64data) {
         while (base64data.length % 4 !== 0) {
@@ -225,22 +225,16 @@ var OAuthService = (function () {
     ;
     OAuthService.prototype.hasValidIdToken = function () {
         if (this.getIdToken()) {
+            var issuer = this._storage.getItem("id_token_issuer");
+            if (issuer != this.issuer) {
+                return false;
+            }
             var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
                 return false;
             }
             return true;
-        }
-        return false;
-    };
-    ;
-    OAuthService.prototype.hasValidOrigin = function () {
-        if (this.getOrigin()) {
-            if (this.getOrigin() === window.location.origin) {
-                return true;
-            }
-            return false;
         }
         return false;
     };
@@ -256,6 +250,7 @@ var OAuthService = (function () {
         this._storage.removeItem("expires_at");
         this._storage.removeItem("id_token_claims_obj");
         this._storage.removeItem("id_token_expires_at");
+        this._storage.removeItem("id_token_issuer");
         if (!this.logoutUrl)
             return;
         var logoutUrl = this.logoutUrl.replace(/\{\{id_token\}\}/, id_token);

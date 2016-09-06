@@ -221,7 +221,7 @@ export class OAuthService {
         this._storage.setItem("id_token", idToken);
         this._storage.setItem("id_token_claims_obj", claimsJson);
         this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
-        this._storage.setItem("origin", window.location.origin);
+        this._storage.setItem("id_token_issuer", this.issuer);
 
         if (this.validationHandler) {
             this.validationHandler(idToken)
@@ -240,8 +240,8 @@ export class OAuthService {
         return this._storage.getItem("id_token");
     }
 
-    getOrigin() {
-        return this._storage.getItem("origin");
+    getIssuer() {
+        return this._storage.getItem("id_token_issuer");
     }
 
     padBase64(base64data) {
@@ -281,6 +281,11 @@ export class OAuthService {
     hasValidIdToken() {
         if (this.getIdToken()) {
 
+            var issuer = this._storage.getItem("id_token_issuer");
+            if(issuer != this.issuer){
+                return false;
+            }
+
             var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
@@ -288,18 +293,6 @@ export class OAuthService {
             }
 
             return true;
-        }
-
-        return false;
-    };
-
-    hasValidOrigin() {
-        if (this.getOrigin()) {
-            if (this.getOrigin() === window.location.origin) {
-                return true;
-            }
-
-            return false;
         }
 
         return false;
@@ -317,6 +310,7 @@ export class OAuthService {
         this._storage.removeItem("expires_at");
         this._storage.removeItem("id_token_claims_obj");
         this._storage.removeItem("id_token_expires_at");
+        this._storage.removeItem("id_token_issuer");
 
         if (!this.logoutUrl) return;
 

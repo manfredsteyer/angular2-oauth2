@@ -20,14 +20,13 @@ export declare class OAuthService {
     processIdToken(idToken: any, accessToken: any): boolean;
     getIdentityClaims(): any;
     getIdToken(): any;
-    getOrigin(): any;
+    getIssuer(): any;
     padBase64(base64data: any): any;
     tryLoginWithIFrame(): void;
     tryRefresh(timeoutInMsec: any): void;
     getAccessToken(): any;
     hasValidAccessToken(): boolean;
     hasValidIdToken(): boolean;
-    hasValidOrigin(): boolean;
     authorizationHeader(): string;
     logOut(): void;
     createAndSaveNonce(): Promise<any>;
