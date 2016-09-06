@@ -59,6 +59,7 @@ var OAuthService = (function () {
     OAuthService.prototype.initImplicitFlow = function (additionalState) {
         if (additionalState === void 0) { additionalState = ""; }
         this.createLoginUrl(additionalState).then(function (url) {
+            this._storage.setItem("issuer", this.issuer);
             location.href = url;
         })
             .catch(function (error) {
@@ -150,12 +151,13 @@ var OAuthService = (function () {
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
         var savedNonce = this._storage.getItem("nonce");
+        var savedIssuer = this._storage.getItem("issuer");
         if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }
-        if (claims.iss !== this.issuer) {
-            console.warn("Wrong issuer: " + claims.iss + " " + this.issuer);
+        if (claims.iss !== savedIssuer) {
+            console.warn("Wrong issuer: " + claims.iss + " " + savedIssuer);
             return false;
         }
         if (claims.nonce !== savedNonce) {
