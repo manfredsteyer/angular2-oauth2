@@ -82,7 +82,14 @@ var OAuthService = (function () {
     OAuthService.prototype.tryLogin = function (options) {
         var _this = this;
         options = options || {};
-        var parts = this.getFragment();
+        var location;
+        if (options.location) {
+            location = options.location;
+        }
+        else {
+            location = window.location;
+        }
+        var parts = this.getFragment(location);
         var accessToken = parts["access_token"];
         var idToken = parts["id_token"];
         var state = parts["state"];
@@ -281,8 +288,8 @@ var OAuthService = (function () {
         });
     };
     ;
-    OAuthService.prototype.getFragment = function () {
-        if (window.location.hash.indexOf("#") === 0) {
+    OAuthService.prototype.getFragment = function (location) {
+        if (location.hash.indexOf("#") === 0) {
             return this.parseQueryString(window.location.hash.substr(1));
         }
         else {

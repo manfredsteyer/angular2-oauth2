@@ -31,7 +31,7 @@ export declare class OAuthService {
     logOut(): void;
     createAndSaveNonce(): Promise<any>;
     createNonce(): Promise<{}>;
-    getFragment(): {};
+    getFragment(location: Location): {};
     parseQueryString(queryString: any): {};
     checkAtHash(accessToken: any, idClaims: any): boolean;
 }

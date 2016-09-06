@@ -93,9 +93,14 @@ export class OAuthService {
     tryLogin(options) {
 
         options = options || {};
+        var location: Location;
+        if (options.location){
+            location = options.location;
+        } else {
+            location = window.location;
+        }      
 
-
-        var parts = this.getFragment();
+        var parts = this.getFragment(location);
 
         var accessToken = parts["access_token"];
         var idToken = parts["id_token"];
@@ -347,8 +352,8 @@ export class OAuthService {
         });
     };
 
-    getFragment() {
-        if (window.location.hash.indexOf("#") === 0) {
+    getFragment(location: Location) {
+        if (location.hash.indexOf("#") === 0) {
             return this.parseQueryString(window.location.hash.substr(1));
         } else {
             return {};
