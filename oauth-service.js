@@ -147,7 +147,7 @@ var OAuthService = (function () {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }
-        if (this.issuer && claims.iss !== this.issuer) {
+        if (claims.iss !== this.issuer) {
             console.warn("Wrong issuer: " + claims.iss);
             return false;
         }
