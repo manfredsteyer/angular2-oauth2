@@ -175,6 +175,7 @@ var OAuthService = (function () {
         this._storage.setItem("id_token", idToken);
         this._storage.setItem("id_token_claims_obj", claimsJson);
         this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
+        this._storage.setItem("origin", window.location.origin);
         if (this.validationHandler) {
             this.validationHandler(idToken);
         }
@@ -188,6 +189,9 @@ var OAuthService = (function () {
     };
     OAuthService.prototype.getIdToken = function () {
         return this._storage.getItem("id_token");
+    };
+    OAuthService.prototype.getOrigin = function () {
+        return this._storage.getItem("origin");
     };
     OAuthService.prototype.padBase64 = function (base64data) {
         while (base64data.length % 4 !== 0) {
@@ -227,6 +231,16 @@ var OAuthService = (function () {
                 return false;
             }
             return true;
+        }
+        return false;
+    };
+    ;
+    OAuthService.prototype.hasValidOrigin = function () {
+        if (this.getOrigin()) {
+            if (this.getOrigin() === window.location.origin) {
+                return true;
+            }
+            return false;
         }
         return false;
     };
