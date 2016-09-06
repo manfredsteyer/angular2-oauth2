@@ -59,7 +59,6 @@ var OAuthService = (function () {
     OAuthService.prototype.initImplicitFlow = function (additionalState) {
         if (additionalState === void 0) { additionalState = ""; }
         this.createLoginUrl(additionalState).then(function (url) {
-            this._storage.setItem("issuer", this.issuer);
             location.href = url;
         })
             .catch(function (error) {
@@ -270,6 +269,7 @@ var OAuthService = (function () {
         var that = this;
         return this.createNonce().then(function (nonce) {
             that._storage.setItem("nonce", nonce);
+            that._storage.setItem("issuer", that.issuer);
             return nonce;
         });
     };

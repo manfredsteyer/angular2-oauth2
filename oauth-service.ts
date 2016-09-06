@@ -68,8 +68,7 @@ export class OAuthService {
     };
 
     initImplicitFlow(additionalState = "") {
-        this.createLoginUrl(additionalState).then(function (url) {
-            this._storage.setItem("issuer", this.issuer);
+        this.createLoginUrl(additionalState).then(function (url) {          
             location.href = url;
         })
             .catch(function (error) {
@@ -329,6 +328,7 @@ export class OAuthService {
         var that = this;
         return this.createNonce().then(function (nonce: any) {
             that._storage.setItem("nonce", nonce);
+            that._storage.setItem("issuer", that.issuer);
             return nonce;
         })
 
