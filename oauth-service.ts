@@ -186,7 +186,7 @@ export class OAuthService {
         }
 
         if (claims.iss !== this.issuer) {
-            console.warn("Wrong issuer: " + claims.iss);
+            console.warn("Wrong issuer: " + claims.iss + " " + this.issuer);
             return false;
         }
 

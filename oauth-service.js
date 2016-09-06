@@ -148,7 +148,7 @@ var OAuthService = (function () {
             return false;
         }
         if (claims.iss !== this.issuer) {
-            console.warn("Wrong issuer: " + claims.iss);
+            console.warn("Wrong issuer: " + claims.iss + " " + this.issuer);
             return false;
         }
         if (claims.nonce !== savedNonce) {
