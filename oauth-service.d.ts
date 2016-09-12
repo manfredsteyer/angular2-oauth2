@@ -9,6 +9,7 @@ export declare class OAuthService {
     options: any;
     state: string;
     issuer: string;
+    forcePrompt: boolean;
     validationHandler: any;
     logoutUrl: string;
     setStorage(storage: Storage): void;

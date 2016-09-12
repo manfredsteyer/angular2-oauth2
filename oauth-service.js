@@ -52,6 +52,9 @@ var OAuthService = (function () {
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
             }
+            if (that.forcePrompt) {
+                url += "&prompt=login";
+            }
             return url;
         });
     };

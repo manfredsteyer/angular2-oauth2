@@ -16,6 +16,7 @@ export class OAuthService {
     public options: any;
     public state = "";
     public issuer = "";
+    public forcePrompt: boolean;
     public validationHandler: any;
     public logoutUrl = "";
 
@@ -63,12 +64,16 @@ export class OAuthService {
                 url += "&nonce=" + encodeURIComponent(nonce);
             }
 
+            if (that.forcePrompt) {
+                url += "&prompt=login";
+            }
+
             return url;
         });
     };
 
     initImplicitFlow(additionalState = "") {
-        this.createLoginUrl(additionalState).then(function (url) {          
+        this.createLoginUrl(additionalState).then(function (url) {
             location.href = url;
         })
             .catch(function (error) {
@@ -94,11 +99,11 @@ export class OAuthService {
 
         options = options || {};
         var location: Location;
-        if (options.location){
+        if (options.location) {
             location = options.location;
         } else {
             location = window.location;
-        }      
+        }
 
         var parts = this.getFragment(location);
 
@@ -288,7 +293,7 @@ export class OAuthService {
         if (this.getIdToken()) {
 
             var issuer = this._storage.getItem("id_token_issuer");
-            if(issuer != this.issuer){
+            if (issuer != this.issuer) {
                 return false;
             }
 
