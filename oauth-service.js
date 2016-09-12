@@ -126,8 +126,10 @@ var OAuthService = (function () {
         }
         if (this.oidc) {
             oidcSuccess = this.processIdToken(idToken, accessToken);
-            if (!oidcSuccess)
+            if (!oidcSuccess) {
+                this.forcePrompt = true;
                 return false;
+            }
         }
         if (options.validationHandler) {
             var validationParams = { accessToken: accessToken, idToken: idToken };

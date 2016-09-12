@@ -149,7 +149,10 @@ export class OAuthService {
 
         if (this.oidc) {
             oidcSuccess = this.processIdToken(idToken, accessToken);
-            if (!oidcSuccess) return false;
+            if (!oidcSuccess){ 
+                this.forcePrompt = true;
+                return false;
+            }
         }
 
 
