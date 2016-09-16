@@ -8,7 +8,6 @@ export declare class OAuthService {
     oidc: boolean;
     options: any;
     state: string;
-    issuer: string;
     forcePrompt: boolean;
     validationHandler: any;
     logoutUrl: string;
@@ -21,7 +20,7 @@ export declare class OAuthService {
     processIdToken(idToken: any, accessToken: any): boolean;
     getIdentityClaims(): any;
     getIdToken(): any;
-    getIssuer(): any;
+    setTenantIssuer(issuer: string): void;
     padBase64(base64data: any): any;
     tryLoginWithIFrame(): void;
     tryRefresh(timeoutInMsec: any): void;

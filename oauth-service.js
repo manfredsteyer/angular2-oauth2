@@ -13,7 +13,6 @@ var OAuthService = (function () {
         this.rngUrl = "";
         this.oidc = false;
         this.state = "";
-        this.issuer = "";
         this.logoutUrl = "";
         this._storage = localStorage;
     }
@@ -155,13 +154,13 @@ var OAuthService = (function () {
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
         var savedNonce = this._storage.getItem("nonce");
-        var savedIssuer = this._storage.getItem("issuer");
+        var tenantIssuer = this._storage.getItem("tenant_issuer");
         if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }
-        if (claims.iss !== savedIssuer) {
-            console.warn("Wrong issuer: " + claims.iss + " " + savedIssuer);
+        if (claims.iss !== tenantIssuer) {
+            console.warn("Wrong issuer: " + claims.iss + " " + tenantIssuer);
             return false;
         }
         if (claims.nonce !== savedNonce) {
@@ -177,7 +176,7 @@ var OAuthService = (function () {
         var expiresAtMSec = claims.exp * 1000;
         var tenMinutesInMsec = 1000 * 60 * 10;
         if (issuedAtMSec - tenMinutesInMsec >= now || expiresAtMSec + tenMinutesInMsec <= now) {
-            console.warn("Token has been expired");
+            console.warn("Token has expired");
             console.warn({
                 now: now,
                 issuedAtMSec: issuedAtMSec,
@@ -186,9 +185,9 @@ var OAuthService = (function () {
             return false;
         }
         this._storage.setItem("id_token", idToken);
+        this._storage.setItem("id_token_issuer", claims.iss);
         this._storage.setItem("id_token_claims_obj", claimsJson);
         this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
-        this._storage.setItem("id_token_issuer", this.issuer);
         if (this.validationHandler) {
             this.validationHandler(idToken);
         }
@@ -203,8 +202,8 @@ var OAuthService = (function () {
     OAuthService.prototype.getIdToken = function () {
         return this._storage.getItem("id_token");
     };
-    OAuthService.prototype.getIssuer = function () {
-        return this._storage.getItem("id_token_issuer");
+    OAuthService.prototype.setTenantIssuer = function (issuer) {
+        return this._storage.setItem("tenant_issuer", issuer);
     };
     OAuthService.prototype.padBase64 = function (base64data) {
         while (base64data.length % 4 !== 0) {
@@ -239,7 +238,8 @@ var OAuthService = (function () {
     OAuthService.prototype.hasValidIdToken = function () {
         if (this.getIdToken()) {
             var issuer = this._storage.getItem("id_token_issuer");
-            if (issuer != this.issuer) {
+            var tenantIssuer = this._storage.getItem("tenantIssuer");
+            if (issuer != tenantIssuer) {
                 return false;
             }
             var expiresAt = this._storage.getItem("id_token_expires_at");
@@ -274,7 +274,6 @@ var OAuthService = (function () {
         var that = this;
         return this.createNonce().then(function (nonce) {
             that._storage.setItem("nonce", nonce);
-            that._storage.setItem("issuer", that.issuer);
             return nonce;
         });
     };
