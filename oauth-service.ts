@@ -295,7 +295,7 @@ export class OAuthService {
         if (this.getIdToken()) {
 
             var issuer = this._storage.getItem("id_token_issuer");
-            var tenantIssuer = this._storage.getItem("tenantIssuer");
+            var tenantIssuer = this._storage.getItem("tenant_issuer");
             if (issuer != tenantIssuer) {
                 return false;
             }
