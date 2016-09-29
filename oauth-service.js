@@ -8,12 +8,13 @@ var OAuthService = (function () {
         this.clientId = "";
         this.redirectUri = "";
         this.loginUrl = "";
+        this.resource = "";
         this.scope = "";
         this.rngUrl = "";
         this.oidc = false;
         this.state = "";
-        this.issuer = "";
         this.logoutUrl = "";
+        this.policy = "";
         this._storage = localStorage;
     }
     OAuthService.prototype.setStorage = function (storage) {
@@ -33,21 +34,28 @@ var OAuthService = (function () {
             }
             var response_type = "token";
             if (that.oidc) {
-                response_type = "id_token+token";
+                response_type = "id_token";
             }
             var url = that.loginUrl
                 + "?response_type="
-                + response_type
+                + encodeURIComponent(response_type)
                 + "&client_id="
                 + encodeURIComponent(that.clientId)
                 + "&state="
                 + encodeURIComponent(state)
                 + "&redirect_uri="
                 + encodeURIComponent(that.redirectUri)
+                + "&resource="
+                + encodeURIComponent(that.resource)
                 + "&scope="
-                + encodeURIComponent(that.scope);
+                + encodeURIComponent(that.scope)
+                + "&p="
+                + encodeURIComponent(that.policy);
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
+            }
+            if (that.forcePrompt) {
+                url += "&prompt=login";
             }
             return url;
         });
@@ -79,13 +87,20 @@ var OAuthService = (function () {
     OAuthService.prototype.tryLogin = function (options) {
         var _this = this;
         options = options || {};
-        var parts = this.getFragment();
+        var location;
+        if (options.location) {
+            location = options.location;
+        }
+        else {
+            location = window.location;
+        }
+        var parts = this.getFragment(location);
         var accessToken = parts["access_token"];
         var idToken = parts["id_token"];
         var state = parts["state"];
         var oidcSuccess = false;
         var oauthSuccess = false;
-        if (!accessToken || !state)
+        if ((!accessToken && !idToken) || !state)
             return false;
         if (this.oidc && !idToken)
             return false;
@@ -113,8 +128,10 @@ var OAuthService = (function () {
         }
         if (this.oidc) {
             oidcSuccess = this.processIdToken(idToken, accessToken);
-            if (!oidcSuccess)
+            if (!oidcSuccess) {
+                this.forcePrompt = true;
                 return false;
+            }
         }
         if (options.validationHandler) {
             var validationParams = { accessToken: accessToken, idToken: idToken };
@@ -140,13 +157,13 @@ var OAuthService = (function () {
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
         var savedNonce = this._storage.getItem("nonce");
+        var tenantIssuer = this._storage.getItem("tenant_issuer");
         if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }
-        if (this.issuer && claims.iss !== this.issuer) {
-            console.warn("Wrong issuer: " + claims.iss);
-            return false;
+        if (claims.iss !== tenantIssuer) {
+            console.warn("Wrong issuer: " + claims.iss + " " + tenantIssuer);
         }
         if (claims.nonce !== savedNonce) {
             console.warn("Wrong nonce: " + claims.nonce);
@@ -161,7 +178,7 @@ var OAuthService = (function () {
         var expiresAtMSec = claims.exp * 1000;
         var tenMinutesInMsec = 1000 * 60 * 10;
         if (issuedAtMSec - tenMinutesInMsec >= now || expiresAtMSec + tenMinutesInMsec <= now) {
-            console.warn("Token has been expired");
+            console.warn("Token has expired");
             console.warn({
                 now: now,
                 issuedAtMSec: issuedAtMSec,
@@ -170,6 +187,7 @@ var OAuthService = (function () {
             return false;
         }
         this._storage.setItem("id_token", idToken);
+        this._storage.setItem("id_token_issuer", claims.iss);
         this._storage.setItem("id_token_claims_obj", claimsJson);
         this._storage.setItem("id_token_expires_at", "" + expiresAtMSec);
         if (this.validationHandler) {
@@ -185,6 +203,9 @@ var OAuthService = (function () {
     };
     OAuthService.prototype.getIdToken = function () {
         return this._storage.getItem("id_token");
+    };
+    OAuthService.prototype.setTenantIssuer = function (issuer) {
+        return this._storage.setItem("tenant_issuer", issuer);
     };
     OAuthService.prototype.padBase64 = function (base64data) {
         while (base64data.length % 4 !== 0) {
@@ -217,7 +238,12 @@ var OAuthService = (function () {
     };
     ;
     OAuthService.prototype.hasValidIdToken = function () {
-        if (this.getIdToken) {
+        if (this.getIdToken()) {
+            var issuer = this._storage.getItem("id_token_issuer");
+            var tenantIssuer = this._storage.getItem("tenant_issuer");
+            if (issuer != tenantIssuer) {
+                return false;
+            }
             var expiresAt = this._storage.getItem("id_token_expires_at");
             var now = new Date();
             if (expiresAt && parseInt(expiresAt) < now.getTime()) {
@@ -239,6 +265,7 @@ var OAuthService = (function () {
         this._storage.removeItem("expires_at");
         this._storage.removeItem("id_token_claims_obj");
         this._storage.removeItem("id_token_expires_at");
+        this._storage.removeItem("id_token_issuer");
         if (!this.logoutUrl)
             return;
         var logoutUrl = this.logoutUrl.replace(/\{\{id_token\}\}/, id_token);
@@ -269,8 +296,8 @@ var OAuthService = (function () {
         });
     };
     ;
-    OAuthService.prototype.getFragment = function () {
-        if (window.location.hash.indexOf("#") === 0) {
+    OAuthService.prototype.getFragment = function (location) {
+        if (location.hash.indexOf("#") === 0) {
             return this.parseQueryString(window.location.hash.substr(1));
         }
         else {
