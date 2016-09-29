@@ -18,6 +18,7 @@ export class OAuthService {
     public forcePrompt: boolean;
     public validationHandler: any;
     public logoutUrl = "";
+    public policy = "";
 
     public setStorage(storage: Storage) {
         this._storage = storage;
@@ -42,12 +43,12 @@ export class OAuthService {
             var response_type = "token";
 
             if (that.oidc) {
-                response_type = "id_token+token";
+                response_type = "id_token";
             }
 
             var url = that.loginUrl
                 + "?response_type="
-                + response_type
+                + encodeURIComponent(response_type)
                 + "&client_id="
                 + encodeURIComponent(that.clientId)
                 + "&state="
@@ -57,7 +58,9 @@ export class OAuthService {
                 + "&resource="
                 + encodeURIComponent(that.resource)
                 + "&scope="
-                + encodeURIComponent(that.scope);
+                + encodeURIComponent(that.scope)
+                + "&p="
+                + encodeURIComponent(that.policy);
 
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
@@ -113,7 +116,7 @@ export class OAuthService {
         var oidcSuccess = false;
         var oauthSuccess = false;
 
-        if (!accessToken || !state) return false;
+        if ((!accessToken && !idToken) || !state) return false;
         if (this.oidc && !idToken) return false;
 
         var savedNonce = this._storage.getItem("nonce");
@@ -200,7 +203,7 @@ export class OAuthService {
 
         if (claims.iss !== tenantIssuer) {
             console.warn("Wrong issuer: " + claims.iss + " " + tenantIssuer);
-            return false;
+            // return false;
         }
 
         if (claims.nonce !== savedNonce) {

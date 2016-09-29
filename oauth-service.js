@@ -14,6 +14,7 @@ var OAuthService = (function () {
         this.oidc = false;
         this.state = "";
         this.logoutUrl = "";
+        this.policy = "";
         this._storage = localStorage;
     }
     OAuthService.prototype.setStorage = function (storage) {
@@ -33,11 +34,11 @@ var OAuthService = (function () {
             }
             var response_type = "token";
             if (that.oidc) {
-                response_type = "id_token+token";
+                response_type = "id_token";
             }
             var url = that.loginUrl
                 + "?response_type="
-                + response_type
+                + encodeURIComponent(response_type)
                 + "&client_id="
                 + encodeURIComponent(that.clientId)
                 + "&state="
@@ -47,7 +48,9 @@ var OAuthService = (function () {
                 + "&resource="
                 + encodeURIComponent(that.resource)
                 + "&scope="
-                + encodeURIComponent(that.scope);
+                + encodeURIComponent(that.scope)
+                + "&p="
+                + encodeURIComponent(that.policy);
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
             }
@@ -97,7 +100,7 @@ var OAuthService = (function () {
         var state = parts["state"];
         var oidcSuccess = false;
         var oauthSuccess = false;
-        if (!accessToken || !state)
+        if ((!accessToken && !idToken) || !state)
             return false;
         if (this.oidc && !idToken)
             return false;
@@ -161,7 +164,6 @@ var OAuthService = (function () {
         }
         if (claims.iss !== tenantIssuer) {
             console.warn("Wrong issuer: " + claims.iss + " " + tenantIssuer);
-            return false;
         }
         if (claims.nonce !== savedNonce) {
             console.warn("Wrong nonce: " + claims.nonce);
