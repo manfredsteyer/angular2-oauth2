@@ -10,6 +10,7 @@ export class OAuthService {
     public redirectUri = "";
     public loginUrl = "";
     public scope = "";
+    public resource = "";
     public rngUrl = "";
     public oidc = false;
     public options: any;
@@ -48,13 +49,17 @@ export class OAuthService {
                         + "?response_type="
                         + response_type
                         + "&client_id=" 
-                        + encodeURIComponent(that.clientId) 
+                        + encodeURIComponent(that.clientId)
                         + "&state=" 
-                        + encodeURIComponent(state) 
+                        + encodeURIComponent(state)
                         + "&redirect_uri=" 
                         + encodeURIComponent(that.redirectUri) 
                         + "&scope=" 
                         + encodeURIComponent(that.scope);
+
+            if (that.resource) {
+                url += "&resource=" + encodeURIComponent(that.resource);
+            }
             
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
