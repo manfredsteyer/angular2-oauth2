@@ -2,6 +2,14 @@
 
 Support for OAuth 2 and OpenId Connect (OIDC) for Angular 2.
 
+
+# IMORTANT
+
+This is an old version of this library. You can find the new one here:
+
+- https://github.com/manfredsteyer/angular-oauth2-oidc
+- https://www.npmjs.com/package/angular-oauth2-oidc
+
 ## Router
 
 Successfully tested with the Angular 2 (RC) Component Router, PathLocationStrategy and CommonJS-Bundling via webpack.
