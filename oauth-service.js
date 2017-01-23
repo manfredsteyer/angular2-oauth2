@@ -1,7 +1,7 @@
 "use strict";
-var js_base64_1 = require('js-base64');
-var base64_js_1 = require('base64-js');
-var _sha256 = require('sha256');
+var js_base64_1 = require("js-base64");
+var base64_js_1 = require("base64-js");
+var _sha256 = require("sha256");
 var sha256 = _sha256;
 var OAuthService = (function () {
     function OAuthService() {
@@ -15,6 +15,7 @@ var OAuthService = (function () {
         this.state = "";
         this.issuer = "";
         this.logoutUrl = "";
+        this.acr_values = "";
         this._storage = localStorage;
     }
     OAuthService.prototype.setStorage = function (storage) {
@@ -52,6 +53,9 @@ var OAuthService = (function () {
             }
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
+            }
+            if (that.acr_values) {
+                url += "&acr_values=" + encodeURIComponent(that.acr_values);
             }
             return url;
         });
@@ -144,12 +148,7 @@ var OAuthService = (function () {
         var claimsJson = js_base64_1.Base64.decode(claimsBase64);
         var claims = JSON.parse(claimsJson);
         var savedNonce = this._storage.getItem("nonce");
-        if (Array.isArray(claims.aud)) {
-            if (-1 === claims.aud.indexOf(this.clientId)) {
-                console.warn("Wrong audience: " + claims.aud);
-                return false;
-            }
-        } else if (claims.aud !== this.clientId) {
+        if (claims.aud !== this.clientId) {
             console.warn("Wrong audience: " + claims.aud);
             return false;
         }

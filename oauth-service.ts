@@ -18,7 +18,8 @@ export class OAuthService {
     public issuer = "";
     public validationHandler: any;
     public logoutUrl = "";
-    
+    public acr_values = "";
+
     public setStorage(storage: Storage) {
         this._storage = storage;
     }
@@ -63,6 +64,10 @@ export class OAuthService {
             
             if (that.oidc) {
                 url += "&nonce=" + encodeURIComponent(nonce);
+            }
+
+            if (that.acr_values) {
+                url += "&acr_values=" + encodeURIComponent(that.acr_values);
             }
             
             return url;

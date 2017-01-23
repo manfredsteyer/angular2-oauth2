@@ -11,6 +11,7 @@ export declare class OAuthService {
     issuer: string;
     validationHandler: any;
     logoutUrl: string;
+    acr_values: string;
     setStorage(storage: Storage): void;
     private _storage;
     createLoginUrl(state: any): Promise<string>;
@@ -19,11 +20,11 @@ export declare class OAuthService {
     tryLogin(options: any): boolean;
     processIdToken(idToken: any, accessToken: any): boolean;
     getIdentityClaims(): any;
-    getIdToken(): any;
+    getIdToken(): string;
     padBase64(base64data: any): any;
     tryLoginWithIFrame(): void;
     tryRefresh(timeoutInMsec: any): void;
-    getAccessToken(): any;
+    getAccessToken(): string;
     hasValidAccessToken(): boolean;
     hasValidIdToken(): boolean;
     authorizationHeader(): string;
