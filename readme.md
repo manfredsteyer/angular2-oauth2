@@ -93,6 +93,9 @@ export class AppComponent {
         // set to true, to receive also an id_token via OpenId Connect (OIDC) in addition to the
         // OAuth2-based access_token
         this.oauthService.oidc = true;
+
+        // Optional Authentication Context Class Reference
+        this.oauthService.acr_values = "tenant:Acme"
         
         // Use setStorage to use sessionStorage or another implementation of the TS-type Storage
         // instead of localStorage
