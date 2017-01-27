@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "description": "client side oauth2 reference token handler",
   "main": "oauth-service.js",
-  "author": "Manfred Steyer (http://www.softwarearchitekt.at)",
-  "repository": "https://github.com/manfredsteyer/angular2-oauth2.git",
+  "author": "James Hague",
+  "repository": "https://github.com/jameshague/angular2-oauth2.git",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.35",
+    "@types/sinon": "^1.16.34",
+    "chai": "^3.5.0",
+    "concurrently": "^3.1.0",
+    "sinon": "^1.17.6",
+    "source-map-support": "^0.4.5"
+  }
 }
