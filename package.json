@@ -1,15 +1,10 @@
 {
-  "name": "angular2-oauth2",
-  "version": "1.3.11",
-  "description": "",
+  "name": "oauth2-reference-token",
+  "version": "1.0.0",
+  "description": "client side oauth2 reference token handler",
   "main": "oauth-service.js",
   "author": "Manfred Steyer (http://www.softwarearchitekt.at)",
   "repository": "https://github.com/manfredsteyer/angular2-oauth2.git",
   "license": "MIT",
-  "dependencies": {
-    "base64-js": "^0",
-    "buffer": "^3",
-    "js-base64": "^2.1.9",
-    "sha256": "^0.2.0"
-  }
+  "dependencies": {}
 }
