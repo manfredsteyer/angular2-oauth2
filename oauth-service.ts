@@ -25,6 +25,20 @@ export class OAuthService {
     
     private _storage: Storage = localStorage;
     
+    /**
+     * Returns when the current token will expire or null if there is no expiration time
+     */
+    get expiresAt(): Date {
+            var expiresAt = this._storage.getItem("expires_at");
+            if (expiresAt) {
+                var i = parseInt(expiresAt);
+                if (i) {
+                    return new Date(i);
+                }
+            }
+            return null;
+    }
+
     createLoginUrl(state) {
         var that = this;
 
