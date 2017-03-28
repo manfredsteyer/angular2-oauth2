@@ -5,6 +5,10 @@
   "main": "oauth-service.js",
   "author": "Manfred Steyer (http://www.softwarearchitekt.at)",
   "repository": "https://github.com/manfredsteyer/angular2-oauth2.git",
+  "homepage": "https://github.com/manfredsteyer/angular2-oauth2",
+  "bugs": {
+    "url": "https://github.com/manfredsteyer/angular2-oauth2/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "base64-js": "^0",
