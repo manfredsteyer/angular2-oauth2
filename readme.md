@@ -3,7 +3,7 @@
 Support for OAuth 2 and OpenId Connect (OIDC) for Angular 2.
 
 
-# IMORTANT
+# IMPORTANT
 
 This is an old version of this library. You can find the new one here:
 
